@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="js/jquery-3.5.1.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+
+    <script src="jquery.autocomplete.js"></script>
+    <title>Autocomplete</title>
+  </head>
+  <body>
+    <div class="container">
+      <form>
+        <div class="form-group">
+          <label for="exampleInputEmai1">Choose language</label>
+          <input
+            type="text"
+            class="form-control auto"
+            id="exampleInputEmai1"
+            aria-describedby="emilHelp"
+          />
+          <small id="emailHelp" class="form-text text-muted">
+            We'll never share your skills with anyone else.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="Country">Type Country</label>
+          <input type="text" class="form-control ajax" id="Country" />
+        </div>
+        <div class="form-group">
+          <label for="Country">Disable</label>
+          <input type="text" class="form-control disabled" disabled id="Country" />
+        </div>
+      </form>
+    </div>
+    <script>
+      $(document).ready(function () {
+        var availableTags = [
+          "ActionScript",
+          "AppleScript",
+          "Asp",
+          "BASIC",
+          "C",
+          "C++",
+          "Clojure",
+          "COBOL",
+          "ColdFusion",
+          "Erlang",
+          "Fortran",
+          "Groovy",
+          "Haskell",
+          "Java",
+          "JavaScript",
+          "Lisp",
+          "Perl",
+          "PHP",
+          "Python",
+          "Ruby",
+          "Scala",
+          "Scheme",
+        ];
+
+        $(".disabled").autocomplete({
+          source: availableTags,
+          allowCustomText: true,
+          menuClass: "dropdown-menu bg-info ",
+          menuItemClass: "dropdown-item text-white",
+        });
+
+
+        $(".auto").autocomplete({
+          source: availableTags,
+          allowCustomText: true,
+          menuClass: "dropdown-menu bg-info ",
+          menuItemClass: "dropdown-item text-white",
+        });
+
+        $(".ajax").autocomplete({
+          highlightClass: "bg-light text-dark",
+          wrapperClass: "dropdown",
+          menuClass: "dropdown-menu",
+          menuItemClass: "dropdown-item",
+          menuOpenClass: "show",
+          source: function (term, response) {
+            $.ajax({
+              method: "GET",
+              url: "https://parseapi.back4app.com/classes/Country",
+              data: {
+                limit: 5,
+                order: "name",
+                keys: "name",
+                where: { name: { $regex: term } },
+              },
+              dataType: "json",
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                  "X-Parse-Application-Id",
+                  "mxsebv4KoWIGkRntXwyzg6c6DhKWQuit8Ry9sHja"
+                );
+                xhr.setRequestHeader(
+                  "X-Parse-Master-Key",
+                  "TpO0j3lG2PmEVMXlKYQACoOXKQrL3lwM0HwR9dbH"
+                );
+              },
+            }).done(function (msg) {
+              var arr = $.map(msg.results, function (item) {
+                return item.name;
+              });
+              response(arr);
+            });
+          },
+          allowCustomText: false,
+          noRecordsFound: "Keine Elemnte Gefunden!",
+          noRecordsFoundClass: "dropdown-item bg-danger text-white",
+          itemFormat: function (text, cssclass) {
+            return $("<div/>", {
+              text: text,
+              class: cssclass,
+            });
+          },
+          wrapperFormat: function (cssclass) {
+            return $("<div/>", {
+              class: cssclass,
+            });
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
